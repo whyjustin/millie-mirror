@@ -1,0 +1,5 @@
+.idea/
+*.imp
+*.pyc
+settings.json
+training.xml
