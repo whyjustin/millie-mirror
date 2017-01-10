@@ -26,12 +26,6 @@ class MillieMirror:
 
         self.gtk_fixed = gtk.Fixed()
 
-        self.gtk_image = gtk.Image()
-        self.event_box_image = gtk.EventBox()
-        self.event_box_image.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(0, 0, 0))
-        self.event_box_image.add(self.gtk_image)
-        self.gtk_fixed.add(self.event_box_image)
-
         self.info_text = gtk.TextView()
         self.info_text.set_editable(False)
         self.info_text.set_cursor_visible(False)
@@ -88,9 +82,6 @@ class MillieMirror:
             height, width, z = background_image.shape
             scale_width = float(self.settings.background_image_width) / width
             scale_height = float(self.settings.background_image_height) / height
-
-            # width = self.screen_width if self.settings.background_image_width > self.screen_width else self.settings.background_image_width
-            # height = self.screen_height if self.settings.background_image_height > self.screen_height else self.settings.background_image_height
 
             background_image = cv2.flip(background_image, 1)
             recognition_image = numpy.copy(background_image)
@@ -174,15 +165,6 @@ class MillieMirror:
             img_pixbuf = gtk.gdk.pixbuf_new_from_array(background_image, gtk.gdk.COLORSPACE_RGB, 8)
             graphics_context = self.gtk_drawing_area.window.new_gc()
             self.pixmap.draw_pixbuf(graphics_context, img_pixbuf, 0, 0, x, y, -1, -1, gtk.gdk.RGB_DITHER_NONE, 0, 0)
-
-            # self.gtk_image.set_from_pixbuf(img_pixbuf)
-            # self.gtk_image.set_size_request(width, height)
-            # self.gtk_image.show()
-            # self.event_box_image.show()
-            # self.gtk_fixed.move(self.event_box_image, x, y)
-            # else:
-            #     self.gtk_image.hide()
-            #     self.event_box_image.hide()
 
     def draw_face_rectangles(self, transform, faces):
         if self.settings.showing_face_rectangles:
