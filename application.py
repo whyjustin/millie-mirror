@@ -58,6 +58,7 @@ class MillieMirror:
         self.kill_background = False
 
         self.recognizing_face = False
+        self.pending_delete_training = False
         self.temporary_notice_timer = None
         self.temporary_notice = None
 
@@ -130,6 +131,8 @@ class MillieMirror:
             self.settings.showing_face_rectangles = not self.settings.showing_face_rectangles
         elif event.keyval == gtk.keysyms.a:
             self.on_a_press()
+        elif event.keyval == gtk.keysyms.r:
+            self.on_r_press()
         elif event.keyval == gtk.keysyms.Return:
             self.on_enter_press()
 
@@ -185,6 +188,8 @@ class MillieMirror:
 
         if self.recognizing_face:
             text = "Recognizing Face: Press Enter to capture. Press a to exit mode and train."
+        elif self.pending_delete_training:
+            text = "Delete all training data? Press Enter to continue. Press r to cancel."
 
         if self.temporary_notice is not None:
             text += "\n" + self.temporary_notice
@@ -197,12 +202,17 @@ class MillieMirror:
         self.gtk_pixmap.draw_layout(white_gc, text_pad, text_pad, pango_layout)
 
     def on_a_press(self):
+        if not self.pending_delete_training:
+            if not self.recognizing_face:
+                self.recognizing_face = True
+                self.face_recognizer.init_new_face()
+            else:
+                self.recognizing_face = False
+                self.face_recognizer.train_faces()
+
+    def on_r_press(self):
         if not self.recognizing_face:
-            self.recognizing_face = True
-            self.face_recognizer.init_new_face()
-        else:
-            self.recognizing_face = False
-            self.face_recognizer.train_faces()
+            self.pending_delete_training = not self.pending_delete_training
 
     def on_enter_press(self):
         if self.recognizing_face:
@@ -211,6 +221,9 @@ class MillieMirror:
             success, error = self.face_recognizer.add_new_face(image)
             if not success:
                 self.set_temporary_notice(error)
+        if self.pending_delete_training:
+            self.face_recognizer.delete_training()
+            self.pending_delete_training = False
 
     def set_temporary_notice(self, text):
         if self.temporary_notice_timer is not None:

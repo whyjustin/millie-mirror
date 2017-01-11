@@ -1,4 +1,5 @@
 import os
+import shutil
 
 import cv2
 import numpy
@@ -93,3 +94,10 @@ class FaceRecognizer:
         training_model.train(numpy.asarray(images), numpy.asarray(labels))
         training_model.save(self.training_file_name)
         self.model = training_model
+
+    def delete_training(self):
+        if os.path.isdir(self.training_image_directory):
+            shutil.rmtree(self.training_image_directory)
+        if os.path.isfile(self.training_file_name):
+            os.remove(self.training_file_name)
+        self.model = None
