@@ -1,6 +1,8 @@
 .idea/
 *.imp
 *.pyc
+images/
+scenes/
 training_images/
 settings.json
 training.xml

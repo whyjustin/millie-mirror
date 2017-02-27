@@ -2,14 +2,15 @@ import threading
 import time
 
 import cv2
+import webcam
 import gobject
 import gtk
 import numpy
 import pango
 
 import face_recognizer
+import scene
 import settings
-import webcam
 
 gobject.threads_init()
 
@@ -41,6 +42,9 @@ class MillieMirror:
         self.gtk_pixmap = None
         self.gtk_fixed.add(self.gtk_drawing_area)
         self.gtk_drawing_area.show()
+
+        #self.pixbuf_animation_blue_bird_iter = gtk.gdk.PixbufAnimation('images/bluebird.gif').get_iter()
+        self.scene = scene.Scene()
 
         self.settings_marshaller.default_if_none('background_image_width', self.screen_width)
         self.settings_marshaller.default_if_none('background_image_height', self.screen_height)
@@ -147,6 +151,8 @@ class MillieMirror:
 
         self.draw_background_image(transform, background_image)
         self.draw_face_rectangles(transform, faces)
+        self.scene.draw_frame(self.gtk_drawing_area, self.gtk_pixmap, transform, faces)
+
         self.draw_help_text()
 
         self.gtk_drawing_area.queue_draw_area(0, 0, self.screen_width, self.screen_height)
