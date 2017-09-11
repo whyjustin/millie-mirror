@@ -32,6 +32,9 @@ class Settings:
         self.top_pad = None
         self.showing_face_rectangles = None
         self.recognition_threshold = None
+        self.use_webcam = None
+        self.default_height = None
+        self.default_width = None
 
     def load(self, data):
         self.__dict__ = data

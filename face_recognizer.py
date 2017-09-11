@@ -2,6 +2,7 @@ import os
 import shutil
 
 import cv2
+import cv2.face
 import numpy
 
 
@@ -16,16 +17,16 @@ class FaceRecognizer:
 
         self.model = None
         if os.path.isfile(self.training_file_name):
-            self.model = cv2.createLBPHFaceRecognizer(threshold=self.settings.recognition_threshold)
+            self.model = cv2.face.LBPHFaceRecognizer_create(threshold=self.settings.recognition_threshold)
             self.model.load(self.training_file_name)
 
         self.cascade_classifier = cv2.CascadeClassifier(self.cascade_file_name)
 
     def detect_faces(self, image):
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-        faces = self.cascade_classifier.detectMultiScale(image, scaleFactor=1.2, minNeighbors=3, minSize=(50, 50),
-                                                        flags=cv2.cv.CV_HAAR_SCALE_IMAGE)
+        faces = self.cascade_classifier.detectMultiScale(image, scaleFactor=1.2, minNeighbors=3, minSize=(200, 200),
+                                                        flags=cv2.CASCADE_SCALE_IMAGE)
 
         detected_faces = []
         for face in faces:
@@ -80,7 +81,7 @@ class FaceRecognizer:
         self.training_user = None
         self.training_user_iteration = None
 
-        training_model = cv2.createLBPHFaceRecognizer()
+        training_model = cv2.face.LBPHFaceRecognizer_create()
         images = []
         labels = []
         for directory in os.listdir(self.training_image_directory):

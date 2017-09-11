@@ -2,7 +2,6 @@ import threading
 import time
 
 import cv2
-import webcam
 import gobject
 import gtk
 import numpy
@@ -27,9 +26,12 @@ class MillieMirror:
         self.gtk_window.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(0, 0, 0))
 
         self.gtk_fixed = gtk.Fixed()
-
         self.gtk_window.add(self.gtk_fixed)
+
+        if self.settings.default_height is not None and self.settings.default_width is not None:
+            self.gtk_window.set_default_size(self.settings.default_width, self.settings.default_height)
         self.gtk_window.fullscreen()
+
         self.gtk_fixed.show()
         self.gtk_window.show()
         self.screen_width, self.screen_height = self.gtk_window.get_size()
@@ -55,7 +57,7 @@ class MillieMirror:
         self.settings_marshaller.default_if_none('recognition_threshold', 80)
         self.settings_marshaller.save()
 
-        self.camera = webcam.OpenCVCapture(device_id=0)
+        self.camera = self.get_camera()
 
         self.background_thread = threading.Thread(target=self.background_work)
         self.background_thread.daemon = True
@@ -70,7 +72,16 @@ class MillieMirror:
         self.background_thread.start()
         gtk.main()
 
+    def get_camera(self):
+        if self.settings.use_webcam:
+            import webcam
+            return webcam.OpenCVCapture(device_id=0)
+        else:
+            import picam
+            return picam.OpenCVCapture()
+
     def background_work(self):
+        time.sleep(2)
         while True and not self.kill_background:
             x = (self.screen_width - self.settings.background_image_width) / 2
             y = (self.screen_height - self.settings.background_image_height) / 2
@@ -98,7 +109,7 @@ class MillieMirror:
             gobject.idle_add(self.foreground_work, (x, y, scale_width, scale_height), background_image, faces)
 
             if not self.kill_background:
-                time.sleep(1.0 / 30)
+                time.sleep(1.0 / 30.0)
 
     def on_key_press_event(self, widget, event):
         if event.keyval == gtk.keysyms.Escape:

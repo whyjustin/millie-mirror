@@ -15,7 +15,7 @@ class Scene:
                 self.scenes = json.load(scene_file)
 
         self.next_scene = 0
-        if len(self.scenes) > 0:
+        if self.scenes is not None and len(self.scenes) > 0:
             self.load_scene(self.next_scene)
 
     def load_scene(self, index):

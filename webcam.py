@@ -18,7 +18,7 @@ import cv2
 CAPTURE_HZ = 30.0
 
 
-class OpenCVCapture(object):
+class OpenCVCapture:
     def __init__(self, device_id=0):
         """Create an OpenCV capture object associated with the provided webcam
         device ID.
